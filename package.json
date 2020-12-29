@@ -1,0 +1,32 @@
+{
+  "name": "actions-issue-labeler",
+  "version": "1.0.0",
+  "description": "A GitHub Action that add label to PR related issue.",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint index.js",
+    "package": "ncc build index.js -mqo dist",
+    "format": "prettier --trailing-comma es5 --single-quote --write index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vibeus/actions-issue-labeler.git"
+  },
+  "author": "Jiulong Wang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vibeus/actions-issue-labeler/issues"
+  },
+  "homepage": "https://github.com/vibeus/actions-issue-labeler#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.4",
+    "@actions/exec": "^1.0.4",
+    "@actions/github": "^4.0.0",
+    "@actions/io": "^1.0.2"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.26.1",
+    "eslint": "^7.4.0",
+    "prettier": "^2.0.5"
+  }
+}

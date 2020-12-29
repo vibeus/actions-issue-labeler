@@ -1,0 +1,18 @@
+name: 'PR Issue Labeler'
+description: 'A GitHub Action that add label to PR related issue.'
+inputs:
+  github-token:
+    description: 'GitHub token'
+    required: true
+  owner:
+    description: 'Repo owner'
+    required: true
+  repo:
+    description: 'Repo name'
+    required: true
+  label-merged:
+    description: 'Label to add when PR is merged'
+    default: 'done'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
