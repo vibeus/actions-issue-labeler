@@ -8,8 +8,6 @@ To trigger this action, at least one line in PR description should match followi
 /^bug:\s*(#\d+)\s*$/
 ```
 
-If more than one line matches this regex, the first match is used.
-
 ## Tips
 If the PR contributes to a bug, but does not fully resolve it, add any none whitespace content to prevent match. E.g.
 ```
