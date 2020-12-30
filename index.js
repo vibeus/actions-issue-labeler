@@ -1,20 +1,28 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-async function getBug(octokit, pr) {
+async function getBugs(octokit, pr) {
   const { body } = pr;
-  const match = body.match(/^bug:\s*#(\d+)\s*$/m);
-  if (!match) {
-    return null;
+  const matches = body.matchAll(/^bug:\s*#(\d+)\s*$/gm);
+  const bugs = [];
+  const visited = new Set();
+
+  for (const match of matches) {
+    if (visited.has(match[1])) {
+      continue;
+    }
+
+    const resp = await octokit.issues.get({
+      owner: core.getInput('owner'),
+      repo: core.getInput('repo'),
+      issue_number: match[1],
+    });
+
+    bugs.push(resp.data);
+    visited.add(matches[1]);
   }
 
-  const resp = await octokit.issues.get({
-    owner: core.getInput('owner'),
-    repo: core.getInput('repo'),
-    issue_number: match[1],
-  });
-
-  return resp.data;
+  return bugs;
 }
 
 async function run() {
@@ -22,20 +30,29 @@ async function run() {
   const pr = github.context.payload.pull_request;
   const octokit = github.getOctokit(core.getInput('github-token'));
 
-  const bug = await getBug(octokit, pr);
+  const bugs = await getBugs(octokit, pr);
   const label_merged = core.getInput('label-merged');
-  if (bug) {
+
+  if (!bugs || bugs.length === 0) {
+    return;
+  }
+
+  for (const bug of bugs) {
     core.info(`Found related bug: #${bug.number}.`);
-    if (action === 'opened' || action === 'reopened') {
-      core.info(`Creating comment to PR #${pr.number}.`);
-      await octokit.issues.createComment({
-        owner: core.getInput('owner'),
-        repo: core.getInput('repo'),
-        issue_number: pr.number,
-        body: `🐛 #${bug.number} will be marked as \`${label_merged}\` when merged 🎉.`,
-      });
-    } else if (action == 'closed' && pr.merged) {
-      core.info(`PR #${pr.number} is merged.`);
+  }
+
+  if (action === 'opened' || action === 'edited') {
+    core.info(`Creating comment to PR #${pr.number}.`);
+    const bug_list = bugs.map((b) => `#${b.number}`).join(', ');
+    await octokit.issues.createComment({
+      owner: core.getInput('owner'),
+      repo: core.getInput('repo'),
+      issue_number: pr.number,
+      body: `🐛 ${bug_list} will be marked as \`${label_merged}\` when merged 🎉.`,
+    });
+  } else if (action == 'closed' && pr.merged) {
+    core.info(`PR #${pr.number} is merged.`);
+    for (const bug of bugs) {
       if (!bug.labels.includes(label_merged)) {
         core.info(`Adding label ${label_merged} to bug #${bug.number}.`);
         await octokit.issues.addLabels({
