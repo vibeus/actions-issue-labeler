@@ -5,7 +5,7 @@ This action automatically add "done" label to issues when related PR is merged.
 To trigger this action, at least one line in PR description should match following regex:
 
 ```regex
-/^bug:\s*(#\d+)\s*$/
+/^bug:\s*((#\d+)[,\s]*)+$/
 ```
 
 ## Tips
