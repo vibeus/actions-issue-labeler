@@ -30,8 +30,8 @@ async function getBugs(octokit, pr) {
 }
 
 async function run() {
-  const { action } = github.context.event;
-  const pr = github.context.event.pull_request;
+  const { action } = github.context.payload;
+  const pr = github.context.payload.pull_request;
   const octokit = github.getOctokit(core.getInput('github-token'));
 
   const bugs = await getBugs(octokit, pr);
