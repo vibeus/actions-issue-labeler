@@ -2,7 +2,12 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 async function getBugs(octokit, pr) {
-  const { body = '' } = pr;
+  const { body } = pr;
+
+  if (!body || body.length === 0) {
+    return [];
+  }
+
   const matches = body.matchAll(/^bug:\s*(#(\d+)[,\s]*)+$/gm);
   const bugs = [];
   const visited = new Set();
