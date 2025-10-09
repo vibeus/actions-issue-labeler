@@ -8,12 +8,12 @@ async function getBugs(octokit, pr) {
     return [];
   }
 
-  const matches = body.matchAll(/^bug:\s*(#(\d+)[,\s]*)+$/gm);
+  const matches = body.matchAll(/^bug:\s*((?:\[#\d+\]\([^)]+\)|#\d+)[,\s]*)+$/gm);
   const bugs = [];
   const visited = new Set();
 
   for (const match of matches) {
-    const subMatches = match[0].matchAll(/#(\d+)/gm);
+    const subMatches = match[0].matchAll(/\[?#(\d+)\]?(?:\([^)]+\))?/gm);
     for (const subMatch of subMatches) {
       const bugId = subMatch[1];
       if (visited.has(bugId)) {
